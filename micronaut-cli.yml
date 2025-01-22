@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.core
+testFramework: junit
+sourceLanguage: kotlin
+buildTool: gradle
+features: [app-name, gradle, hibernate-jpa, hibernate-reactive-jpa, hibernate-validator, http-client-test, jdbc-hikari, junit, kotlin, kotlin-application, ksp, logback, micronaut-aot, micronaut-build, micronaut-http-validation, netty-server, postgres, properties, reactor, reactor-http-client, readme, serialization-jackson, shade, static-resources, test-resources]
