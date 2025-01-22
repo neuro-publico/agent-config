@@ -1,6 +1,7 @@
 package com.core.services.impl
 
 import com.core.extensions.EvaluatorPinecone
+import com.core.extensions.replacePlaceholders
 import com.core.externals.vectordb.clients.VectordbClient
 import com.core.externals.vectordb.requests.QueryRequest
 import com.core.externals.vectordb.requests.Record
@@ -33,6 +34,7 @@ class AgentConfigServiceImpl(
             existingConfig.preferences = request.preferences
             existingConfig.prompt = request.prompt
             existingConfig.description = request.description
+            existingConfig.metadata = request.metadata
             existingConfig.modelAI = request.modelAI
             existingConfig.providerAI = request.providerAI
             existingConfig.updatedAt = LocalDateTime.now()
@@ -43,12 +45,12 @@ class AgentConfigServiceImpl(
                 this.preferences = request.preferences
                 this.prompt = request.prompt
                 this.description = request.description
+                this.metadata = request.metadata
                 this.modelAI = request.modelAI
                 this.indexName = request.indexName
                 this.namespace = request.namespace
                 this.providerAI = request.providerAI
                 this.providerVectorDB = request.providerVectorDB
-                this.metadata = request.metadata
             }
             this.agentConfigRepository.save(newConfig)
         }
@@ -120,6 +122,7 @@ class AgentConfigServiceImpl(
         return agent.map {
             val toolIds = this.agentToolRepository.findByAgentConfigId(it.id!!).map { it.toolId }
             it.tools = this.toolRepository.findByIdIn(toolIds)
+            it.prompt = it.prompt.replacePlaceholders(request.parameterPrompt)
             it
         }
     }

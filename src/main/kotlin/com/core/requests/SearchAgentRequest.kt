@@ -9,5 +9,7 @@ data class SearchAgentRequest(
     val agentId: String? = null,
     val query: String? = null,
     @field:JsonProperty("metadata_filter")
-    val metadataFilter: List<Map<String, Any>>? = null
+    val metadataFilter: List<Map<String, Any>>? = null,
+    @field:JsonProperty("parameter_prompt")
+    val parameterPrompt: Map<String, Any>? = null
 )
