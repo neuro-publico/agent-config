@@ -9,19 +9,21 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
+import com.core.externals.vectordb.clients.VectordbClient
+import com.core.requests.SearchAgentRequest
+import io.micronaut.http.annotation.QueryValue
+import reactor.core.publisher.Mono
 
 @Controller("/config")
 @ExecuteOn(TaskExecutors.IO)
 class AgentConfigController(
     private val agentConfigService: AgentConfigServiceInterface,
-    private val toolServiceInterface: ToolServiceInterface
+    private val toolServiceInterface: ToolServiceInterface,
+    private val vectordbClient: VectordbClient
 ) {
     @Post
     fun upsertAgentConfig(@Body request: CreateAgentConfigRequest): HttpResponse<AgentConfig> {
-        val agentConfig = this.agentConfigService.upsertAgentConfig(
-            agentId = request.agentId,
-            preferences = request.preferences
-        )
+        val agentConfig = this.agentConfigService.upsertAgentConfig(request)
         return HttpResponse.ok(agentConfig)
     }
 
@@ -41,6 +43,11 @@ class AgentConfigController(
         this.agentConfigService.removeToolFromAgent(agentId, tool.id!!)
 
         return HttpResponse.ok()
+    }
+
+    @Post("/search-agent")
+    fun searchAgent(@Body request: SearchAgentRequest): Mono<AgentConfig> {
+        return this.agentConfigService.getAgent(request)
     }
 }
 

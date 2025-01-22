@@ -14,11 +14,11 @@ import java.time.LocalDateTime
 
 @Serdeable
 @Entity(name = "tools")
-class Tool{
+class Tool {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tool_seq_generator")
     @SequenceGenerator(name = "tool_seq_generator", sequenceName = "tools_id_seq", allocationSize = 1)
-     var id: Long? = null
+    var id: Long? = null
 
     @Column(name = "tool_name")
     @field:JsonProperty("tool_name")

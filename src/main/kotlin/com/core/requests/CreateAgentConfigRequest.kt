@@ -8,5 +8,27 @@ import io.micronaut.serde.annotation.Serdeable
 data class CreateAgentConfigRequest(
     @field:JsonProperty("agent_id")
     val agentId: String,
-    val preferences: Preference?
+    val preferences: Preference?,
+    @field:JsonProperty("description")
+    var description: String,
+    @field:JsonProperty("index_name")
+    var indexName: String = "startup",
+
+    @field:JsonProperty("namespace")
+    var namespace: String = "agents",
+
+    @field:JsonProperty("metadata")
+    var metadata: Map<String, Any>? = null,
+
+    @field:JsonProperty("provider_vector_db")
+    var providerVectorDB: String = "pinecone",
+
+    @field:JsonProperty("prompt")
+    var prompt: String = "",
+
+    @field:JsonProperty("provider_ai")
+    var providerAI: String? = null,
+
+    @field:JsonProperty("model_ai")
+    var modelAI: String? = null
 )

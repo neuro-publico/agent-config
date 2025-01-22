@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 
 @Serdeable
 @Entity(name = "agent_tool")
-class AgentTool{
+class AgentTool {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "agent_tool_generator")
     @SequenceGenerator(name = "agent_tool_generator", sequenceName = "agent_tool_id_seq", allocationSize = 1)

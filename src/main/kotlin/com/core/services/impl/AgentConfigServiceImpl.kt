@@ -1,47 +1,76 @@
 package com.core.services.impl
 
+import com.core.extensions.EvaluatorPinecone
+import com.core.externals.vectordb.clients.VectordbClient
+import com.core.externals.vectordb.requests.QueryRequest
+import com.core.externals.vectordb.requests.Record
+import com.core.externals.vectordb.requests.UpsertDataRequestVectorDB
 import com.core.models.AgentConfig
 import com.core.models.AgentTool
-import com.core.models.Preference
 import com.core.repositories.AgentToolRepository
-import com.core.repositories.ToolRepository
 import com.core.repository.AgentConfigRepository
 import com.core.services.AgentConfigServiceInterface
+import com.core.requests.CreateAgentConfigRequest
+import com.core.requests.SearchAgentRequest
 import jakarta.inject.Singleton
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 
 @Singleton
 class AgentConfigServiceImpl(
     private val agentConfigRepository: AgentConfigRepository,
-    private val toolRepository: ToolRepository,
-    private val agentToolRepository: AgentToolRepository
+    private val agentToolRepository: AgentToolRepository,
+    private val vectordbClient: VectordbClient
 ) : AgentConfigServiceInterface {
 
-    override fun upsertAgentConfig(agentId: String, preferences: Preference?): AgentConfig {
-        val existingConfig = this.agentConfigRepository.findByAgentId(agentId)
+    override fun upsertAgentConfig(request: CreateAgentConfigRequest): AgentConfig {
+        val existingConfig = this.agentConfigRepository.findByAgentId(request.agentId)
 
-        return if (existingConfig != null) {
-            // Actualizar preferencias y fecha de actualización
-            existingConfig.preferences = preferences
+        val agentConfig = if (existingConfig != null) {
+            existingConfig.preferences = request.preferences
+            existingConfig.prompt = request.prompt
+            existingConfig.description = request.description
+            existingConfig.modelAI = request.modelAI
+            existingConfig.providerAI = request.providerAI
             existingConfig.updatedAt = LocalDateTime.now()
             this.agentConfigRepository.update(existingConfig)
         } else {
-            // Crear nueva configuración
             val newConfig = AgentConfig().apply {
-                this.agentId = agentId
-                this.preferences = preferences
+                this.agentId = request.agentId
+                this.preferences = request.preferences
+                this.prompt = request.prompt
+                this.description = request.description
+                this.modelAI = request.modelAI
+                this.indexName = request.indexName
+                this.namespace = request.namespace
+                this.providerAI = request.providerAI
+                this.providerVectorDB = request.providerVectorDB
+                this.metadata = request.metadata
             }
             this.agentConfigRepository.save(newConfig)
         }
+
+        this.vectordbClient.upsertData(
+            agentConfig.providerVectorDB, agentConfig.indexName, UpsertDataRequestVectorDB().apply {
+                this.namespace = agentConfig.namespace
+                this.records = listOf(Record().apply {
+                    this.id = agentConfig.agentId
+                    this.data = mapOf("prompt" to agentConfig.prompt, "description" to agentConfig.description)
+                    this.metadata = request.metadata ?: mapOf()
+                })
+            }
+        ).subscribeOn(Schedulers.boundedElastic()).subscribe()
+
+        return agentConfig
     }
 
     override fun addToolToAgent(agentId: String, toolId: Long): AgentTool {
         val agentConfig = this.agentConfigRepository.findByAgentId(agentId)
-  ?: throw IllegalArgumentException("Agent not found")
+            ?: throw IllegalArgumentException("Agent not found")
         val agentToolExists = this.agentToolRepository.findByAgentConfigIdAndToolId(agentConfig.id!!, toolId)
         if (agentToolExists != null) throw IllegalArgumentException("tool agent already exists")
-        print(agentToolExists)
+
         val agentTool = AgentTool().apply {
             this.agentConfigId = agentConfig.id!!;
             this.toolId = toolId
@@ -50,8 +79,42 @@ class AgentConfigServiceImpl(
         return this.agentToolRepository.save(agentTool)
     }
 
-    override  fun removeToolFromAgent(agentId: String, toolId: Long) {
-        val agentConfig = this.agentConfigRepository.findByAgentId(agentId) ?: throw IllegalArgumentException("Agent not found")
+    override fun removeToolFromAgent(agentId: String, toolId: Long) {
+        val agentConfig =
+            this.agentConfigRepository.findByAgentId(agentId) ?: throw IllegalArgumentException("Agent not found")
         this.agentToolRepository.deleteByAgentConfigIdAndToolId(agentConfig.id!!, toolId)
+    }
+
+    override fun getAgent(request: SearchAgentRequest): Mono<AgentConfig> {
+        return when {
+            request.agentId != null -> {
+                Mono.just(this.searchAgentId(request.agentId))
+            }
+
+            request.query != null -> {
+                val queryRequest = QueryRequest().apply {
+                    this.query = request.query
+                    this.metadataFilter = request.metadataFilter?.associate { item ->
+                        val key = item["key"] as? String ?: throw IllegalArgumentException("Missing 'key' in metadata filter")
+                        val value = item["value"] as? String ?: throw IllegalArgumentException("Missing 'value' in metadata filter")
+                        val evaluator = item["evaluator"] as? String ?: throw IllegalArgumentException("Missing 'evaluator' in metadata filter")
+
+                        //TODO ONLY PINECONE SUPPORTED
+                        key to EvaluatorPinecone.transformEvaluator(evaluator, value)
+                    } ?: emptyMap()
+                }
+                this.vectordbClient.search(queryRequest.providerDB, queryRequest.indexName, queryRequest).map {
+                    val response = it.firstOrNull() ?: throw IllegalArgumentException("GET Agent not found")
+                    this.searchAgentId(response.id)
+                }
+            }
+
+            else -> throw IllegalArgumentException("GET Agent not found")
+        }
+    }
+
+    private fun searchAgentId(agentId: String): AgentConfig {
+        return this.agentConfigRepository.findByAgentId(agentId)
+            ?: throw IllegalArgumentException("GET Agent not found")
     }
 }

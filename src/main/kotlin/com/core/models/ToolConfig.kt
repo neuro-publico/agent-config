@@ -6,5 +6,5 @@ import io.micronaut.serde.annotation.Serdeable
 @Serdeable
 class ToolConfig {
     @field:JsonProperty("parameters")
-   var parameters: Map<String, String>? = null
+    var parameters: Map<String, String>? = null
 }
