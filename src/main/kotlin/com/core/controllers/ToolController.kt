@@ -20,7 +20,6 @@ class ToolController(
         val tool = toolService.upsertTool(
             name = request.name,
             description = request.description,
-            type = request.type,
             config = request.config
         )
         return HttpResponse.created(tool)

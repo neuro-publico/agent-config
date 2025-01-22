@@ -25,10 +25,7 @@ class Tool {
     var toolName: String = ""
 
     @Column(name = "description")
-    var description: String? = null
-
-    @Column(name = "type")
-    var type: String = ""
+    var description: String = ""
 
     @Type(value = JsonBinaryType::class)
     @Column(name = "config", columnDefinition = "jsonb")

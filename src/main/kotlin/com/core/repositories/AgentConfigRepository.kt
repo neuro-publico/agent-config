@@ -5,4 +5,7 @@ import io.micronaut.data.annotation.Repository
 import io.micronaut.data.repository.CrudRepository
 
 @Repository
-interface AgentConfigRepository : CrudRepository<AgentConfig, Long>
+interface AgentConfigRepository : CrudRepository<AgentConfig, Long> {
+    fun findByAgentId(agentId: String): AgentConfig?
+    fun update(agentConfig: AgentConfig): AgentConfig
+}

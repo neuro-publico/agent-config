@@ -8,7 +8,8 @@ import com.core.externals.vectordb.requests.UpsertDataRequestVectorDB
 import com.core.models.AgentConfig
 import com.core.models.AgentTool
 import com.core.repositories.AgentToolRepository
-import com.core.repository.AgentConfigRepository
+import com.core.repositories.ToolRepository
+import com.core.repositories.AgentConfigRepository
 import com.core.services.AgentConfigServiceInterface
 import com.core.requests.CreateAgentConfigRequest
 import com.core.requests.SearchAgentRequest
@@ -21,7 +22,8 @@ import java.time.LocalDateTime
 class AgentConfigServiceImpl(
     private val agentConfigRepository: AgentConfigRepository,
     private val agentToolRepository: AgentToolRepository,
-    private val vectordbClient: VectordbClient
+    private val vectordbClient: VectordbClient,
+    private val toolRepository: ToolRepository
 ) : AgentConfigServiceInterface {
 
     override fun upsertAgentConfig(request: CreateAgentConfigRequest): AgentConfig {
@@ -86,7 +88,7 @@ class AgentConfigServiceImpl(
     }
 
     override fun getAgent(request: SearchAgentRequest): Mono<AgentConfig> {
-        return when {
+        val agent = when {
             request.agentId != null -> {
                 Mono.just(this.searchAgentId(request.agentId))
             }
@@ -95,9 +97,12 @@ class AgentConfigServiceImpl(
                 val queryRequest = QueryRequest().apply {
                     this.query = request.query
                     this.metadataFilter = request.metadataFilter?.associate { item ->
-                        val key = item["key"] as? String ?: throw IllegalArgumentException("Missing 'key' in metadata filter")
-                        val value = item["value"] as? String ?: throw IllegalArgumentException("Missing 'value' in metadata filter")
-                        val evaluator = item["evaluator"] as? String ?: throw IllegalArgumentException("Missing 'evaluator' in metadata filter")
+                        val key =
+                            item["key"] as? String ?: throw IllegalArgumentException("Missing 'key' in metadata filter")
+                        val value = item["value"] as? String
+                            ?: throw IllegalArgumentException("Missing 'value' in metadata filter")
+                        val evaluator = item["evaluator"] as? String
+                            ?: throw IllegalArgumentException("Missing 'evaluator' in metadata filter")
 
                         //TODO ONLY PINECONE SUPPORTED
                         key to EvaluatorPinecone.transformEvaluator(evaluator, value)
@@ -110,6 +115,12 @@ class AgentConfigServiceImpl(
             }
 
             else -> throw IllegalArgumentException("GET Agent not found")
+        }
+
+        return agent.map {
+            val toolIds = this.agentToolRepository.findByAgentConfigId(it.id!!).map { it.toolId }
+            it.tools = this.toolRepository.findByIdIn(toolIds)
+            it
         }
     }
 

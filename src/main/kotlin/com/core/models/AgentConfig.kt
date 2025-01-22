@@ -68,4 +68,8 @@ class AgentConfig {
     @Type(value = JsonBinaryType::class)
     @Column(name = "metadata", columnDefinition = "jsonb")
     var metadata: Map<String, Any>? = null
+
+    @field:JsonProperty("tools")
+    @Transient
+    var tools: List<Tool>? = null
 }

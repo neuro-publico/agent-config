@@ -6,6 +6,7 @@ import io.micronaut.data.repository.CrudRepository
 
 @Repository
 interface AgentToolRepository : CrudRepository<AgentTool, Long> {
+    fun findByAgentConfigId(agentConfigId: Long): List<AgentTool>
     fun findByAgentConfigIdAndToolId(agentConfigId: Long, toolId: Long): AgentTool?
     fun deleteByAgentConfigIdAndToolId(agentConfigId: Long, toolId: Long)
 }

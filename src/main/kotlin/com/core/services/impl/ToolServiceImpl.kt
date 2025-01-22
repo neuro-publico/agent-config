@@ -16,13 +16,12 @@ class ToolServiceImpl(
         return this.toolRepository.findByToolName(toolName) ?: throw IllegalArgumentException("Tool not found")
     }
 
-    override fun upsertTool(name: String, description: String?, type: String, config: ToolConfig?): Tool {
+    override fun upsertTool(name: String, description: String, config: ToolConfig?): Tool {
         val existingTool = toolRepository.findByToolName(name)
 
         return if (existingTool != null) {
             existingTool.apply {
                 this.description = description
-                this.type = type
                 this.config = config
                 this.updatedAt = LocalDateTime.now()
             }
@@ -31,7 +30,6 @@ class ToolServiceImpl(
             this.toolRepository.save(Tool().apply {
                 this.toolName = name
                 this.description = description
-                this.type = type
                 this.config = config
             })
         }

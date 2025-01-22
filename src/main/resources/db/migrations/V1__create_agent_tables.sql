@@ -17,8 +17,7 @@ CREATE TABLE tools
 (
     id          BIGSERIAL PRIMARY KEY,
     tool_name   VARCHAR(255) NOT NULL UNIQUE,
-    description TEXT,
-    type        VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
     config      JSONB,
     created_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

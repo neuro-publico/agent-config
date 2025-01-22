@@ -7,4 +7,6 @@ import io.micronaut.data.repository.CrudRepository
 @Repository
 interface ToolRepository : CrudRepository<Tool, Long> {
     fun findByToolName(name: String): Tool?
+
+    fun findByIdIn(ids: List<Long>): List<Tool>
 }
