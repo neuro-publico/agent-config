@@ -9,11 +9,11 @@ class Preference {
     var extraParameters: Map<String, String>? = null
 
     @field:JsonProperty("temperature")
-    var temperature: Double? = null
+    var temperature: Double = 0.8
 
     @field:JsonProperty("max_tokens")
-    var maxTokens: Long? = null
+    var maxTokens: Long = 200
 
     @field:JsonProperty("top_p")
-    var topP: Double? = null
+    var topP: Double = 1.0
 }

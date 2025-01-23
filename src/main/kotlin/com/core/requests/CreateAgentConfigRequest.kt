@@ -8,7 +8,7 @@ import io.micronaut.serde.annotation.Serdeable
 data class CreateAgentConfigRequest(
     @field:JsonProperty("agent_id")
     val agentId: String,
-    val preferences: Preference?,
+    val preferences: Preference,
     @field:JsonProperty("description")
     var description: String,
     @field:JsonProperty("index_name")
@@ -27,8 +27,8 @@ data class CreateAgentConfigRequest(
     var prompt: String = "",
 
     @field:JsonProperty("provider_ai")
-    var providerAI: String? = null,
+    var providerAI: String = "",
 
     @field:JsonProperty("model_ai")
-    var modelAI: String? = null
+    var modelAI: String = ""
 )

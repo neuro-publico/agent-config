@@ -3,11 +3,11 @@ CREATE TABLE agent_configs
 (
     id          BIGSERIAL PRIMARY KEY,
     agent_id    VARCHAR(255) NOT NULL UNIQUE,
-    description VARCHAR(255),
-    prompt      VARCHAR(255),
-    provider_ai VARCHAR(255),
-    model_ai    VARCHAR(255),
-    preferences JSONB,
+    description VARCHAR(255) NOT NULL ,
+    prompt      VARCHAR(255) NOT NULL ,
+    provider_ai VARCHAR(255) NOT NULL ,
+    model_ai    VARCHAR(255) NOT NULL ,
+    preferences JSONB NOT NULL ,
     created_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

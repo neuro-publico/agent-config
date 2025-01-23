@@ -47,15 +47,15 @@ class AgentConfig {
 
     @Column(name = "provider_ai")
     @field:JsonProperty("provider_ai")
-    var providerAI: String? = null
+    var providerAI: String = ""
 
     @Column(name = "model_ai")
     @field:JsonProperty("model_ai")
-    var modelAI: String? = null
+    var modelAI: String = ""
 
     @Type(value = JsonBinaryType::class)
     @Column(name = "preferences", columnDefinition = "jsonb")
-    var preferences: Preference? = null
+    var preferences: Preference = Preference()
 
     @Column(name = "created_at")
     @field:JsonProperty("created_at")
