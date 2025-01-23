@@ -17,7 +17,7 @@ interface VectordbClient {
         @Body queryRequest: QueryRequest
     ): Mono<List<SearchResponse>>
 
-    @Post("/api/ms//vector-db/upsert_data/{providerDB}/{indexName}")
+    @Post("/api/ms/vector-db/upsert_data/{providerDB}/{indexName}")
     fun upsertData(
         providerDB: String,
         indexName: String,

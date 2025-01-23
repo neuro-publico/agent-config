@@ -4,7 +4,7 @@ CREATE TABLE agent_configs
     id          BIGSERIAL PRIMARY KEY,
     agent_id    VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255) NOT NULL ,
-    prompt      VARCHAR(255) NOT NULL ,
+    prompt      TEXT NOT NULL ,
     provider_ai VARCHAR(255) NOT NULL ,
     model_ai    VARCHAR(255) NOT NULL ,
     preferences JSONB NOT NULL ,
