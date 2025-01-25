@@ -3,6 +3,38 @@
 ## Overview
 The `Agent Config` microservice is responsible for managing agents, their configurations, and tools. It serves as an intermediary for the `Converse` microservice, providing necessary agent context and tools for communication with AI systems like OpenAI or Amazon Bedrock.
 
+## Documentation
+Puedes encontrar la colección completa de Postman con todos los endpoints aquí:
+[Colección Postman](https://sumer-07062021.postman.co/workspace/SUMER~148b538f-9145-4526-8806-bb1cc611d3bd/collection/16642082-01b51a02-01f6-4a39-959e-d1f4675e4bd2?action=share&creator=16642082&active-environment=16640760-5fde9fd8-7328-4098-8d82-c9d5fa254624)
+
+## Construcción y Ejecución
+
+### Usando Docker
+
+1. Construir la imagen Docker (incluye la compilación):
+```bash
+docker build -t agent-config-ms .
+```
+
+2. Ejecutar el contenedor:
+```bash
+docker run -p 8080:8080 agent-config-ms
+```
+
+3. Para detener el contenedor:
+```bash
+docker stop $(docker ps -q --filter ancestor=agent-config-ms)
+```
+
+El servicio estará disponible en `http://localhost:8080`
+
+### Construcción local (alternativa)
+Si prefieres construir y ejecutar localmente sin Docker:
+```bash
+./gradlew clean build
+./gradlew run
+```
+
 This microservice is written in Kotlin and uses PostgreSQL as its database. It has three main tables:
 - **agent_configs**: Stores the configuration details of each agent.
 - **tools**: Stores the details of various tools.
@@ -103,6 +135,7 @@ To retrieve an agent by query similarity, the `Agent Config` microservice commun
 - **Programming Language:** Kotlin
 - **Database:** PostgreSQL
 - **API Framework:** Micronaut
+- **Containerization:** Docker
 
 ## Running Locally
 1. Clone the repository.
