@@ -5,7 +5,7 @@ The `Agent Config` microservice is responsible for managing agents, their config
 
 ## Documentation
 Puedes encontrar la colección completa de Postman con todos los endpoints aquí:
-[Colección Postman](https://sumer-07062021.postman.co/workspace/SUMER~148b538f-9145-4526-8806-bb1cc611d3bd/collection/16642082-01b51a02-01f6-4a39-959e-d1f4675e4bd2?action=share&creator=16642082&active-environment=16640760-5fde9fd8-7328-4098-8d82-c9d5fa254624)
+[Colección Postman](https://sumer-07062021.postman.co/workspace/SUMER~148b538f-9145-4526-8806-bb1cc611d3bd/collection/16642082-cb410cc2-8ada-45d5-b47d-b3d303bee5fe?action=share&creator=16642082&active-environment=16640760-5fde9fd8-7328-4098-8d82-c9d5fa254624)
 
 ## Construcción y Ejecución
 
