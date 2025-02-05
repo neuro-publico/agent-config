@@ -11,4 +11,5 @@ interface AgentConfigServiceInterface {
     fun addToolToAgent(agentId: String, toolId: Long): AgentTool
     fun removeToolFromAgent(agentId: String, toolId: Long)
     fun getAgent(request: SearchAgentRequest): Mono<AgentConfig>
+    fun findAll(): List<AgentConfig>
 }

@@ -34,4 +34,8 @@ class ToolServiceImpl(
             })
         }
     }
+
+    override fun findAll(): List<Tool> {
+        return this.toolRepository.findAll()
+    }
 }

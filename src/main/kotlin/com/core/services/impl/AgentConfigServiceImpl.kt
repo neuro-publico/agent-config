@@ -127,6 +127,10 @@ class AgentConfigServiceImpl(
         }
     }
 
+    override fun findAll(): List<AgentConfig> {
+        return this.agentConfigRepository.findAll()
+    }
+
     private fun searchAgentId(agentId: String): AgentConfig {
         return this.agentConfigRepository.findByAgentId(agentId)
             ?: throw IllegalArgumentException("GET Agent not found")

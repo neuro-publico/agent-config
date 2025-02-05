@@ -21,6 +21,11 @@ class AgentConfigController(
     private val toolServiceInterface: ToolServiceInterface,
     private val vectordbClient: VectordbClient
 ) {
+    @Get
+    fun findAll(): List<AgentConfig> {
+        return this.agentConfigService.findAll()
+    }
+
     @Post
     fun upsertAgentConfig(@Body request: CreateAgentConfigRequest): HttpResponse<AgentConfig> {
         val agentConfig = this.agentConfigService.upsertAgentConfig(request)

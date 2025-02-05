@@ -14,6 +14,10 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 class ToolController(
     private val toolService: ToolServiceInterface
 ) {
+    @Get
+    fun findAll(): List<Tool> {
+        return this.toolService.findAll()
+    }
 
     @Post
     fun upsertTool(@Body request: CreateToolRequest): HttpResponse<Tool> {
