@@ -35,6 +35,7 @@ class AgentConfigServiceImpl(
             existingConfig.prompt = request.prompt
             existingConfig.description = request.description
             existingConfig.metadata = request.metadata
+            existingConfig.mcpConfig = request.mcpConfig
             existingConfig.modelAI = request.modelAI
             existingConfig.providerAI = request.providerAI
             existingConfig.updatedAt = LocalDateTime.now()
@@ -49,6 +50,7 @@ class AgentConfigServiceImpl(
                 this.modelAI = request.modelAI
                 this.indexName = request.indexName
                 this.namespace = request.namespace
+                this.mcpConfig = request.mcpConfig
                 this.providerAI = request.providerAI
                 this.providerVectorDB = request.providerVectorDB
             }
