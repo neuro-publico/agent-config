@@ -20,6 +20,9 @@ data class CreateAgentConfigRequest(
     @field:JsonProperty("metadata")
     var metadata: Map<String, Any>? = null,
 
+    @field:JsonProperty("mcp_config")
+    var mcpConfig: Map<String, Any>? = null,
+
     @field:JsonProperty("provider_vector_db")
     var providerVectorDB: String = "pinecone",
 
