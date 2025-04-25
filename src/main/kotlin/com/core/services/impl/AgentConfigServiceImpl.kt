@@ -36,6 +36,7 @@ class AgentConfigServiceImpl(
             existingConfig.description = request.description
             existingConfig.metadata = request.metadata
             existingConfig.mcpConfig = request.mcpConfig
+            existingConfig.project = request.project
             existingConfig.modelAI = request.modelAI
             existingConfig.providerAI = request.providerAI
             existingConfig.updatedAt = LocalDateTime.now()
