@@ -52,6 +52,7 @@ class AgentConfigServiceImpl(
                 this.indexName = request.indexName
                 this.namespace = request.namespace
                 this.mcpConfig = request.mcpConfig
+                this.project = request.project
                 this.providerAI = request.providerAI
                 this.providerVectorDB = request.providerVectorDB
             }
