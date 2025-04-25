@@ -33,5 +33,8 @@ data class CreateAgentConfigRequest(
     var providerAI: String = "",
 
     @field:JsonProperty("model_ai")
-    var modelAI: String = ""
+    var modelAI: String = "",
+
+    @field:JsonProperty("project")
+    var project: String? = "default"
 )

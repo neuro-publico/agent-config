@@ -37,6 +37,10 @@ class AgentConfig {
     @field:JsonProperty("namespace")
     var namespace: String = "agents"
 
+    @Column(name = "project")
+    @field:JsonProperty("project")
+    var project: String? = "default"
+
     @Column(name = "provider_vector_db")
     @field:JsonProperty("provider_vector_db")
     var providerVectorDB: String = "pinecone"
