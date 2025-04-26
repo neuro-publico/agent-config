@@ -8,9 +8,11 @@ import com.core.externals.vectordb.requests.Record
 import com.core.externals.vectordb.requests.UpsertDataRequestVectorDB
 import com.core.models.AgentConfig
 import com.core.models.AgentTool
+import com.core.models.PromptVersion
 import com.core.repositories.AgentToolRepository
 import com.core.repositories.ToolRepository
 import com.core.repositories.AgentConfigRepository
+import com.core.repositories.PromptVersionRepository
 import com.core.services.AgentConfigServiceInterface
 import com.core.requests.CreateAgentConfigRequest
 import com.core.requests.SearchAgentRequest
@@ -18,17 +20,20 @@ import jakarta.inject.Singleton
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrElse
 
 @Singleton
 class AgentConfigServiceImpl(
     private val agentConfigRepository: AgentConfigRepository,
     private val agentToolRepository: AgentToolRepository,
     private val vectordbClient: VectordbClient,
-    private val toolRepository: ToolRepository
+    private val toolRepository: ToolRepository,
+    private val promptVersionRepository: PromptVersionRepository
 ) : AgentConfigServiceInterface {
 
     override fun upsertAgentConfig(request: CreateAgentConfigRequest): AgentConfig {
         val existingConfig = this.agentConfigRepository.findByAgentId(request.agentId)
+        val originalPrompt = existingConfig?.prompt ?: ""
 
         val agentConfig = if (existingConfig != null) {
             existingConfig.preferences = request.preferences
@@ -40,7 +45,17 @@ class AgentConfigServiceImpl(
             existingConfig.modelAI = request.modelAI
             existingConfig.providerAI = request.providerAI
             existingConfig.updatedAt = LocalDateTime.now()
-            this.agentConfigRepository.update(existingConfig)
+            val agentUpdated = this.agentConfigRepository.update(existingConfig)
+
+            if (originalPrompt != request.prompt) {
+                val promptVersion = PromptVersion(
+                    agentId = existingConfig.agentId,
+                    previousPrompt = existingConfig.prompt
+                )
+                promptVersionRepository.save(promptVersion)
+            }
+
+            agentUpdated
         } else {
             val newConfig = AgentConfig().apply {
                 this.agentId = request.agentId
@@ -138,5 +153,34 @@ class AgentConfigServiceImpl(
     private fun searchAgentId(agentId: String): AgentConfig {
         return this.agentConfigRepository.findByAgentId(agentId)
             ?: throw IllegalArgumentException("GET Agent not found")
+    }
+
+    override fun getPromptHistory(agentId: String): List<PromptVersion> {
+        return promptVersionRepository.findByAgentIdOrderByCreatedAtDesc(agentId)
+    }
+
+    override fun revertPromptVersion(agentId: String, promptVersionId: Long): AgentConfig? {
+        val promptVersionToRevert = promptVersionRepository.findById(promptVersionId)
+            .getOrElse { throw IllegalArgumentException("La versión del prompt no existe.") }
+
+        if (promptVersionToRevert.agentId != agentId) {
+            throw IllegalArgumentException("La versión del prompt no pertenece al agente especificado.")
+        }
+
+        val currentAgentConfig = agentConfigRepository.findByAgentId(agentId)
+            ?: return null
+
+        if (currentAgentConfig.prompt.isNotBlank() && currentAgentConfig.prompt != promptVersionToRevert.previousPrompt) {
+            val currentPromptVersion = PromptVersion(
+                agentId = currentAgentConfig.agentId,
+                previousPrompt = currentAgentConfig.prompt
+            )
+            promptVersionRepository.save(currentPromptVersion)
+        }
+
+        currentAgentConfig.prompt = promptVersionToRevert.previousPrompt ?: ""
+        currentAgentConfig.updatedAt = LocalDateTime.now()
+
+        return agentConfigRepository.update(currentAgentConfig)
     }
 }

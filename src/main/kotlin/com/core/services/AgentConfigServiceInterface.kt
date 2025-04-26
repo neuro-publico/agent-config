@@ -2,6 +2,7 @@ package com.core.services
 
 import com.core.models.AgentConfig
 import com.core.models.AgentTool
+import com.core.models.PromptVersion
 import com.core.requests.CreateAgentConfigRequest
 import com.core.requests.SearchAgentRequest
 import reactor.core.publisher.Mono
@@ -12,4 +13,6 @@ interface AgentConfigServiceInterface {
     fun removeToolFromAgent(agentId: String, toolId: Long)
     fun getAgent(request: SearchAgentRequest): Mono<AgentConfig>
     fun findAll(): List<AgentConfig>
+    fun getPromptHistory(agentId: String): List<PromptVersion>
+    fun revertPromptVersion(agentId: String, promptVersionId: Long): AgentConfig?
 }
