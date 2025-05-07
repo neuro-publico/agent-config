@@ -13,6 +13,7 @@ import com.core.externals.vectordb.clients.VectordbClient
 import com.core.requests.SearchAgentRequest
 import io.micronaut.http.annotation.QueryValue
 import reactor.core.publisher.Mono
+import com.core.models.PromptVersion
 
 @Controller("/config")
 @ExecuteOn(TaskExecutors.IO)
@@ -53,6 +54,20 @@ class AgentConfigController(
     @Post("/search-agent")
     fun searchAgent(@Body request: SearchAgentRequest): Mono<AgentConfig> {
         return this.agentConfigService.getAgent(request)
+    }
+
+    @Get("/{agentId}/prompts/history")
+    fun getAgentPromptHistory(@PathVariable agentId: String): HttpResponse<List<PromptVersion>> {
+        val history = this.agentConfigService.getPromptHistory(agentId)
+        return HttpResponse.ok(history)
+    }
+
+    @Put("/{agentId}/prompts/revert/{promptVersionId}")
+    fun revertAgentPrompt(
+        @PathVariable agentId: String,
+        @PathVariable promptVersionId: Long
+    ): AgentConfig? {
+            return this.agentConfigService.revertPromptVersion(agentId, promptVersionId)
     }
 }
 
