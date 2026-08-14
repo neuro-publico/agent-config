@@ -54,6 +54,10 @@ java {
     sourceCompatibility = JavaVersion.toVersion("21")
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 
 graalvmNative.toolchainDetection = false
 
@@ -86,5 +90,4 @@ micronaut {
 tasks.named("dockerfileNative") {
     jdkVersion = "21"
 }
-
 
