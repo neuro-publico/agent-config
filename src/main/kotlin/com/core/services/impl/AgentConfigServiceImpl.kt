@@ -1,5 +1,6 @@
 package com.core.services.impl
 
+import com.core.ai.GeminiModelPolicy
 import com.core.extensions.EvaluatorPinecone
 import com.core.extensions.replacePlaceholders
 import com.core.externals.vectordb.clients.VectordbClient
@@ -42,7 +43,7 @@ class AgentConfigServiceImpl(
             existingConfig.metadata = request.metadata
             existingConfig.mcpConfig = request.mcpConfig
             existingConfig.project = request.project
-            existingConfig.modelAI = request.modelAI
+            existingConfig.modelAI = GeminiModelPolicy.resolve(request.modelAI)
             existingConfig.providerAI = request.providerAI
             existingConfig.updatedAt = LocalDateTime.now()
             val agentUpdated = this.agentConfigRepository.update(existingConfig)
@@ -63,7 +64,7 @@ class AgentConfigServiceImpl(
                 this.prompt = request.prompt
                 this.description = request.description
                 this.metadata = request.metadata
-                this.modelAI = request.modelAI
+                this.modelAI = GeminiModelPolicy.resolve(request.modelAI)
                 this.indexName = request.indexName
                 this.namespace = request.namespace
                 this.mcpConfig = request.mcpConfig

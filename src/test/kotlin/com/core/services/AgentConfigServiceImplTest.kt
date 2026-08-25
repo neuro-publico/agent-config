@@ -89,6 +89,22 @@ class AgentConfigServiceImplTest {
     }
 
     @Test
+    fun `upsertAgentConfig routes legacy general Gemini models`() {
+        val request = createDefaultRequest().copy(
+            providerAI = "gemini",
+            modelAI = "gemini-3.6-flash"
+        )
+        whenever(agentConfigRepository.findByAgentId("test_agent")).thenReturn(null)
+        whenever(agentConfigRepository.save(any<AgentConfig>())).thenAnswer { invocation ->
+            (invocation.getArgument(0) as AgentConfig).apply { id = 1L }
+        }
+
+        val result = agentConfigService.upsertAgentConfig(request)
+
+        assertEquals("gemini-3.7-flash", result.modelAI)
+    }
+
+    @Test
     fun `upsertAgentConfig should update existing agent when exists`() {
         val request = createDefaultRequest(prompt = "Updated prompt")
         
